@@ -10,8 +10,8 @@
             <charset>utf8</charset>
         </encoder>
     </appender>
-    <logger name="com.netty.tutorial" level="info" additivity="true">
+    <root level="info">
         <appender-ref ref="STDOUT" />
-    </logger>
+    </root>
 
 </configuration>

@@ -3,14 +3,15 @@ package com.netty.tutorial.simplist;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
  * @author cheny.huang
  * @date 2018-10-22 17:31.
  */
+@Slf4j
 public class DiscardServerHandler extends ChannelInboundHandlerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(DiscardServerHandler.class);
     DiscardServerHandler() {
         super();
         log.info("==============init discardServerHandler============");

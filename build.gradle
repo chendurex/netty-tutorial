@@ -1,0 +1,24 @@
+group 'com.netty.tutorial'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    //mavenLocal()
+    maven {
+        url 'http://ci.we.com/nexus/content/groups/public/'
+    }
+    mavenCentral()
+}
+ext {
+    netty_version = '4.1.25.Final'
+}
+dependencies {
+    compile "io.netty:netty-handler:${netty_version}"
+    compile "ch.qos.logback:logback-classic:1.2.3"
+    compile "ch.qos.logback:logback-core:1.2.3"
+    compile "org.slf4j:slf4j-api:1.7.25"
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}

@@ -17,6 +17,7 @@ ext {
 }
 dependencies {
     compile "io.netty:netty-handler:${netty_version}"
+    compile "io.netty:netty-codec-http:${netty_version}"
     compile "ch.qos.logback:logback-classic:1.2.3"
     compile "ch.qos.logback:logback-core:1.2.3"
     compile "org.slf4j:slf4j-api:1.7.25"

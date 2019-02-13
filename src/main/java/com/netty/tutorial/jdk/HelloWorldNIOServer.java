@@ -8,6 +8,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.channels.spi.SelectorProvider;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -18,13 +19,13 @@ import java.util.Set;
 @Slf4j
 public class HelloWorldNIOServer {
     public static void main(String[] args) throws Exception {
-        ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+        ServerSocketChannel serverSocketChannel = SelectorProvider.provider().openServerSocketChannel();
         serverSocketChannel.bind(new InetSocketAddress("localhost", 8080));
         serverSocketChannel.configureBlocking(false);
         // 返回服务端支持的操作，因为服务端仅支持ACCEPT操作，所以也可以直接在注册的时候使用SelectionKey.OP_ACCEPT
         int ops = serverSocketChannel.validOps();
         // 开启多路复用选择器，并且注册到serverSocket中
-        Selector selector = Selector.open();
+        Selector selector = SelectorProvider.provider().openSelector();
         serverSocketChannel.register(selector, ops, null);
         log.info("i'm a server and waiting for new connection and buffer select...");
         for(;;) {
@@ -33,6 +34,7 @@ public class HelloWorldNIOServer {
             Set<SelectionKey> keys = selector.selectedKeys();
             for (Iterator<SelectionKey> ite = keys.iterator(); ite.hasNext();) {
                 SelectionKey key = ite.next();
+                ite.remove();
                 if (key.isAcceptable()) {
                     SocketChannel socketChannel = serverSocketChannel.accept();
                     socketChannel.configureBlocking(false);
@@ -42,6 +44,7 @@ public class HelloWorldNIOServer {
                     SocketChannel socketChannel = (SocketChannel)key.channel();
                     ByteBuffer byteBuffer = ByteBuffer.allocate(256);
                     socketChannel.read(byteBuffer);
+                    // key.interestOps(SelectionKey.OP_WRITE); 注册写事件
                     String result = new String(byteBuffer.array()).trim();
                     log.info("message received:{}", result);
                     socketChannel.write(ByteBuffer.wrap(result.getBytes()));
@@ -53,7 +56,13 @@ public class HelloWorldNIOServer {
                         log.info("server will keep running. try running client again to establish new connection");
                     }
                 }
-                ite.remove();
+                // 注册写事件，只要是channel读完数据，就可以进行写数据，所以会导致无限循环的写数据，需要通过条件控制
+                /*
+                  else if (key.isWritable()) {
+                    log.info("reply...");
+                    SocketChannel socketChannel = (SocketChannel)key.channel();
+                    socketChannel.write(ByteBuffer.wrap("server reply".getBytes()));
+                }*/
             }
         }
     }

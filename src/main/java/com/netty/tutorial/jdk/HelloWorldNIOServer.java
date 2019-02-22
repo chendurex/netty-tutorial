@@ -49,14 +49,15 @@ public class HelloWorldNIOServer {
                     log.info("message received:{}", result);
                     socketChannel.write(ByteBuffer.wrap(result.getBytes()));
                     // 如果对等方直接close，而服务方并未close，就非常容易引发空轮训，netty已经解决这个问题了
-                    // http://blogxin.cn/2017/03/20/Netty-epollbug/
                     if ("bye".equals(result)) {
                         socketChannel.close();
                         log.info("it's time to close connection");
                         log.info("server will keep running. try running client again to establish new connection");
                     }
                 }
-                // 注册写事件，只要是channel读完数据，就可以进行写数据，所以会导致无限循环的写数据，需要通过条件控制
+                // 注册写事件，这个写事件并不是代表channel.write就触发，而是代表channel是否可写，因为socket首先将数据写入缓冲，
+                // 当缓冲满时，是无法写入数据的，这个时候就有可能需要注册write事件来触发写事件了，当触发完毕后记得关闭，防止
+                // 缓冲空闲时一直触发，一般情况缓冲都是空闲的，所以没有必要注册写事件
                 /*
                   else if (key.isWritable()) {
                     log.info("reply...");

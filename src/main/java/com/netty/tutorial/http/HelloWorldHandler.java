@@ -6,6 +6,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
 import io.netty.util.AsciiString;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -21,20 +23,16 @@ public class HelloWorldHandler extends SimpleChannelInboundHandler<HttpRequest> 
     private static final AsciiString KEEP_ALIVE = AsciiString.cached("Keep-alive");
 
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-    }
-
-    @Override
     protected void channelRead0(ChannelHandlerContext ctx, HttpRequest msg) throws Exception {
         FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(CONTENT));
         response.headers().set(CONTENT_TYPE, "text/plain");
         response.headers().setInt(CONTENT_LENGTH, response.content().readableBytes());
         if (!HttpUtil.isKeepAlive(msg)) {
-            ctx.write(response).addListener(ChannelFutureListener.CLOSE);
+            ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         } else {
             response.headers().set(CONNECTION, KEEP_ALIVE);
-            ctx.write(response);
+            ctx.write(response).addListener(future -> System.out.println("completed"));
+            ctx.flush();
         }
     }
 }

@@ -24,10 +24,13 @@ public class WaterMarkClientHandler extends ChannelInboundHandlerAdapter {
         TimeUnit.SECONDS.sleep(1);
     }
 
-   /* @Override
+    /**
+     * 仅仅代表当前缓冲区的数据读完了，并不代表整个请求的数据发送完毕了
+     * @param ctx
+     * @throws Exception
+     */
+    @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        log.info("water client read complete and closed");
-        TimeUnit.MINUTES.sleep(1);
-        ctx.close();
-    }*/
+        log.info("water client read complete");
+    }
 }

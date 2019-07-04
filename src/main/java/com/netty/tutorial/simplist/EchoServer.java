@@ -34,6 +34,7 @@ public class EchoServer {
             log.info("echoServer started");
             f.channel().closeFuture().sync();
         } finally {
+            // boss线程先关闭，不接收新的流量，再关闭worker线程
             boss.shutdownGracefully();
             work.shutdownGracefully();
         }

@@ -26,7 +26,7 @@ public class HelloWorldNIOServer {
         int ops = serverSocketChannel.validOps();
         // 开启多路复用选择器，并且注册到serverSocket中
         Selector selector = SelectorProvider.provider().openSelector();
-        serverSocketChannel.register(selector, ops, null);
+        serverSocketChannel.register(selector, ops);
         log.info("i'm a server and waiting for new connection and buffer select...");
         for(;;) {
             // 开始阻塞等待接收自己感兴趣的IO操作
